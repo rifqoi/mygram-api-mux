@@ -11,7 +11,7 @@ type Response struct {
 	Error   any    `json:"error,omitempty"`
 }
 
-func BadRequestResponse(w http.ResponseWriter, msg string, err any) {
+func ErrorBadRequestResponse(w http.ResponseWriter, msg string, err any) {
 	resp := Response{
 		Message: msg,
 		Error:   err,
@@ -19,11 +19,26 @@ func BadRequestResponse(w http.ResponseWriter, msg string, err any) {
 	baseResponse(w, resp, http.StatusBadRequest)
 }
 
-func SuccessResponse(w http.ResponseWriter, data any, err any) {
+func ErrorInternalServerResponse(w http.ResponseWriter, msg string, err any) {
+	resp := Response{
+		Message: msg,
+		Error:   err,
+	}
+	baseResponse(w, resp, http.StatusInternalServerError)
+}
+
+func ErrorUnprocessableEntity(w http.ResponseWriter, msg string, err any) {
+	resp := Response{
+		Message: msg,
+		Error:   err,
+	}
+	baseResponse(w, resp, http.StatusUnprocessableEntity)
+}
+
+func SuccessResponse(w http.ResponseWriter, data any) {
 	resp := Response{
 		Message: "SUCCESS",
 		Data:    data,
-		Error:   err,
 	}
 	baseResponse(w, resp, http.StatusOK)
 }

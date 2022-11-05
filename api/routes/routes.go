@@ -5,16 +5,24 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rifqoi/mygram-api-mux/api/middlewares"
-	"github.com/rifqoi/mygram-api-mux/api/responses"
+	"github.com/rifqoi/mygram-api-mux/api/controller"
+	"github.com/rifqoi/mygram-api-mux/api/middleware"
+)
+
+const (
+	PUT    = http.MethodPut
+	GET    = http.MethodGet
+	POST   = http.MethodPost
+	DELETE = http.MethodDelete
 )
 
 type Router struct {
-	m middlewares.Middleware
+	m    middleware.Middleware
+	user *controller.UserController
 }
 
-func NewRouter(m middlewares.Middleware) *Router {
-	return &Router{m}
+func NewRouter(m middleware.Middleware, user *controller.UserController) *Router {
+	return &Router{m, user}
 }
 
 func (r *Router) Run() {
@@ -22,13 +30,8 @@ func (r *Router) Run() {
 	mux.Use(r.m.CORS())
 	mux.Use(r.m.LogRequest)
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		data := map[string]interface{}{
-			"asd": "asd",
-		}
-		responses.SuccessResponse(w, data, nil)
-	}).Methods(http.MethodGet)
+	mux.HandleFunc("/users/register", r.user.RegisterUser).Methods(POST)
 
 	log.Println("Server running at port 8000")
-	http.ListenAndServe(":8000", mux)
+	http.ListenAndServe(":8000", r.m.RemoveTrailingSlash(mux))
 }

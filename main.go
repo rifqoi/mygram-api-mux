@@ -1,21 +1,36 @@
 package main
 
 import (
-	"github.com/rifqoi/mygram-api-mux/api/middlewares"
+	"github.com/rifqoi/mygram-api-mux/api/controller"
+	"github.com/rifqoi/mygram-api-mux/api/middleware"
 	"github.com/rifqoi/mygram-api-mux/api/routes"
+	"github.com/rifqoi/mygram-api-mux/config"
+	"github.com/rifqoi/mygram-api-mux/repository/postgres"
+	"github.com/rifqoi/mygram-api-mux/repository/postgres/db"
+	"github.com/rifqoi/mygram-api-mux/services"
 	"go.uber.org/zap"
 )
 
 func main() {
 
 	logger, err := zap.NewProduction()
-
 	if err != nil {
 		panic(err)
 	}
-	logger.Sugar()
-	middleware := middlewares.NewMiddleware(logger)
+	middleware := middleware.NewMiddleware(logger)
 
-	app := routes.NewRouter(middleware)
+	pgDatabase, err := config.ConnectPostgres()
+	if err != nil {
+		panic(err)
+	}
+	q := db.New(pgDatabase)
+
+	userRepo := postgres.NewUserRepository(q)
+
+	userService := services.NewUserService(userRepo)
+
+	userController := controller.NewUserController(userService)
+
+	app := routes.NewRouter(middleware, userController)
 	app.Run()
 }
