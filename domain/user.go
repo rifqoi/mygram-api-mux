@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindUserByEmail(ctx context.Context, email string) (*User, error)
 	UpdateUser(ctx context.Context, userToUpdate db.UpdateUserByIDParams) (*UserUpdateResponse, error)
 	FindUserByID(ctx context.Context, id int) (*User, error)
+	DeleteUserByID(ctx context.Context, id int) error
 }
 
 type User struct {

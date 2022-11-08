@@ -88,6 +88,14 @@ func (u *userRepository) UpdateUser(ctx context.Context, userToUpdate db.UpdateU
 	return resp, nil
 }
 
+func (u *userRepository) DeleteUserByID(ctx context.Context, id int) error {
+	err := u.query.DeleteUserByID(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func checkDuplicate(err error, user *domain.User) error {
 	if err != nil {
 		var pgErr *pgconn.PgError

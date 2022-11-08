@@ -96,6 +96,14 @@ func (u *UserService) UpdateUser(ctx context.Context, currentUserID int, req dom
 	return updatedUser, nil
 }
 
+func (u *UserService) DeleteUser(ctx context.Context, id int) error {
+	err := u.repo.DeleteUserByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // https://stackoverflow.com/questions/71186757/how-to-check-if-the-value-of-a-generic-type-is-the-zero-value
 func checkNullType[T comparable](v T) bool {
 	// new(T) will return a pointer type of type T

@@ -99,3 +99,13 @@ func (u *UserController) Check(w http.ResponseWriter, r *http.Request) {
 
 	responses.SuccessResponse(w, user)
 }
+
+func (u *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	user, err := GetUser(r)
+	if err != nil {
+		responses.ErrorInternalServerResponse(w, err.Error())
+	}
+
+	err = u.svc.DeleteUser(r.Context(), user.ID)
+	responses.SuccessResponse(w, nil)
+}
