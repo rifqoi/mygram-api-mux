@@ -24,12 +24,21 @@ func NewMiddleware(log *zap.Logger, userSvc *services.UserService) Middleware {
 
 func (m *Middleware) LogRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		timeBefore := time.Now()
+
+		next.ServeHTTP(w, r)
+
+		elapsed := time.Now().Sub(timeBefore)
 		m.log.Info(r.Method,
-			zap.Time("time", time.Now()),
+			durationMillis("elapsed_time_ms", elapsed),
+			zap.Duration("elapsed_time_sec", elapsed),
 			zap.String("url", r.URL.String()),
 		)
-		next.ServeHTTP(w, r)
 	})
+}
+
+func durationMillis(name string, d time.Duration) zap.Field {
+	return zap.Int64(name, d.Milliseconds())
 }
 
 func (m *Middleware) CORS() func(http.Handler) http.Handler {
