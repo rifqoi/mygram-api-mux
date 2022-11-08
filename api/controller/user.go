@@ -66,16 +66,34 @@ func (u *UserController) Login(w http.ResponseWriter, r *http.Request) {
 	responses.SuccessResponse(w, token)
 }
 
-func (u *UserController) Check(w http.ResponseWriter, r *http.Request) {
-	userInfo := r.Context().Value("userInfo")
-	if userInfo == nil {
-		responses.UnauthorizedRequest(w, "no user found")
+func (u *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var req domain.UserUpdateParams
+
+	err := ReadJSON(r.Body, &req)
+	if err != nil {
+		responses.ErrorBadRequestResponse(w, err.Error())
 		return
 	}
 
-	user, ok := userInfo.(*domain.User)
-	if !ok {
-		responses.ErrorInternalServerResponse(w, "casting error")
+	currentUser, err := GetUser(r)
+	if err != nil {
+		responses.ErrorInternalServerResponse(w, err.Error())
+		return
+	}
+
+	user, err := u.svc.UpdateUser(r.Context(), currentUser.ID, req)
+	if err != nil {
+		responses.ErrorInternalServerResponse(w, "Error updating user.")
+		return
+	}
+
+	responses.SuccessResponse(w, user)
+}
+
+func (u *UserController) Check(w http.ResponseWriter, r *http.Request) {
+	user, err := GetUser(r)
+	if err != nil {
+		responses.ErrorInternalServerResponse(w, err.Error())
 		return
 	}
 

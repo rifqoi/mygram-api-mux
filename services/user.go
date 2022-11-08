@@ -2,10 +2,12 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/rifqoi/mygram-api-mux/domain"
 	"github.com/rifqoi/mygram-api-mux/helpers"
+	"github.com/rifqoi/mygram-api-mux/repository/postgres/db"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -66,9 +68,40 @@ func (u *UserService) Login(ctx context.Context, req domain.UserLoginParams) (*s
 	return &token, nil
 }
 
-// func (u *UserService) UpdateUser(ctx context.Context, req domain.UserUpdateParams) (*domain.User, error) {
-// 	userToUpdate := db.UpdateUserByIDParams{
-// 		ID: int32(req.ID),
-// 	}
-// 	updatedUser, err := u.repo.UpdateUser(ctx)
-// }
+func (u *UserService) UpdateUser(ctx context.Context, currentUserID int, req domain.UserUpdateParams) (*domain.UserUpdateResponse, error) {
+	userToUpdate := db.UpdateUserByIDParams{
+		ID: int32(currentUserID),
+		Email: sql.NullString{
+			String: req.Email,
+			Valid:  checkNullType(req.Email),
+		},
+		Password: sql.NullString{
+			String: req.Password,
+			Valid:  checkNullType(req.Password),
+		},
+		Username: sql.NullString{
+			String: req.Username,
+			Valid:  checkNullType(req.Username),
+		},
+		Age: sql.NullInt32{
+			Int32: int32(req.Age),
+			Valid: checkNullType(req.Age),
+		},
+	}
+	updatedUser, err := u.repo.UpdateUser(ctx, userToUpdate)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
+}
+
+// https://stackoverflow.com/questions/71186757/how-to-check-if-the-value-of-a-generic-type-is-the-zero-value
+func checkNullType[T comparable](v T) bool {
+	// new(T) will return a pointer type of type T
+	// then we will compare the value of v and dereferenced T (*new(t))
+	// dereferenced T will return the nil type of T (0 for int, "" for string)
+	// so if v is a nil value of the type, it will return true
+	t := *new(T)
+	return v != t
+}

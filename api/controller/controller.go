@@ -2,19 +2,35 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
+	"net/http"
 	"unicode"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
+	"github.com/rifqoi/mygram-api-mux/domain"
 )
 
 func ReadJSON(r io.Reader, data any) error {
 	dec := json.NewDecoder(r)
 	err := dec.Decode(data)
 	return err
+}
+
+func GetUser(r *http.Request) (*domain.User, error) {
+	userInfo := r.Context().Value("userInfo")
+	if userInfo == nil {
+		return nil, errors.New("no user found")
+	}
+
+	user, ok := userInfo.(*domain.User)
+	if !ok {
+		return nil, errors.New("casting error")
+	}
+	return user, nil
 }
 
 func Validate(s interface{}) []string {
