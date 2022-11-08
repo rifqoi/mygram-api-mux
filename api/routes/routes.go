@@ -31,6 +31,8 @@ func (r *Router) Run() {
 	mux.Use(r.m.LogRequest)
 
 	mux.HandleFunc("/users/register", r.user.RegisterUser).Methods(POST)
+	mux.HandleFunc("/users/login", r.user.Login).Methods(POST)
+	mux.Handle("/check", r.m.Auth(http.HandlerFunc(r.user.Check))).Methods(GET)
 
 	log.Println("Server running at port 8000")
 	http.ListenAndServe(":8000", r.m.RemoveTrailingSlash(mux))

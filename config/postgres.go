@@ -23,7 +23,6 @@ func ConnectPostgres() (*pgxpool.Pool, error) {
 		Path:   dbName,
 	}
 
-	fmt.Println(dsn.String())
 	pool, err := pgxpool.Connect(context.Background(), dsn.String())
 	if err != nil {
 		log.Fatal(err)

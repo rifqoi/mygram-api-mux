@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 	"github.com/rifqoi/mygram-api-mux/domain"
 	"github.com/rifqoi/mygram-api-mux/repository/postgres/db"
 )
@@ -39,7 +40,52 @@ func (u *userRepository) InsertUser(ctx context.Context, req domain.UserCreatePa
 	}
 
 	return nil
+}
 
+func (u *userRepository) FindUserByID(ctx context.Context, id int) (*domain.User, error) {
+	res, err := u.query.FindUserById(ctx, int32(id))
+	if err != nil {
+		return nil, errors.New("User not found!")
+	}
+
+	user := &domain.User{
+		ID:       int(res.ID),
+		Email:    res.Email,
+		Username: res.Username,
+		Password: res.Password,
+		Age:      int(res.Age),
+	}
+
+	return user, nil
+}
+func (u *userRepository) FindUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	res, err := u.query.FindUserByEmail(ctx, email)
+	if err != nil {
+		return nil, errors.New("User not found!")
+	}
+
+	user := &domain.User{
+		ID:       int(res.ID),
+		Email:    res.Email,
+		Username: res.Username,
+		Password: res.Password,
+		Age:      int(res.Age),
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) UpdateUser(ctx context.Context, userToUpdate db.UpdateUserByIDParams) (*domain.UserUpdateResponse, error) {
+	updatedUser, err := u.query.UpdateUserByID(ctx, userToUpdate)
+	if err != nil {
+		return nil, err
+	}
+	resp := &domain.UserUpdateResponse{
+		Email:    updatedUser.Email,
+		Username: updatedUser.Username,
+		Age:      int(updatedUser.Age),
+	}
+	return resp, nil
 }
 
 func checkDuplicate(err error, user *domain.User) error {
@@ -47,7 +93,7 @@ func checkDuplicate(err error, user *domain.User) error {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			switch pgErr.Code {
-			case "23505":
+			case pgerrcode.UniqueViolation:
 				if strings.Contains(pgErr.Message, "username") {
 					err = fmt.Errorf("User with username %s already exists.", user.Username)
 				} else if strings.Contains(pgErr.Message, "email") {

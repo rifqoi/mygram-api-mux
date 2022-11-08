@@ -17,7 +17,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	middleware := middleware.NewMiddleware(logger)
 
 	pgDatabase, err := config.ConnectPostgres()
 	if err != nil {
@@ -30,6 +29,8 @@ func main() {
 	userService := services.NewUserService(userRepo)
 
 	userController := controller.NewUserController(userService)
+
+	middleware := middleware.NewMiddleware(logger, userService)
 
 	app := routes.NewRouter(middleware, userController)
 	app.Run()

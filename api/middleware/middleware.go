@@ -6,16 +6,19 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/rifqoi/mygram-api-mux/services"
 	"go.uber.org/zap"
 )
 
 type Middleware struct {
-	log *zap.Logger
+	log     *zap.Logger
+	userSvc *services.UserService
 }
 
-func NewMiddleware(log *zap.Logger) Middleware {
+func NewMiddleware(log *zap.Logger, userSvc *services.UserService) Middleware {
 	return Middleware{
 		log,
+		userSvc,
 	}
 }
 

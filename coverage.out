@@ -1,0 +1,7 @@
+mode: set
+github.com/rifqoi/mygram-api-mux/services/user.go:14.62,16.2 1 1
+github.com/rifqoi/mygram-api-mux/services/user.go:18.120,20.16 2 1
+github.com/rifqoi/mygram-api-mux/services/user.go:23.2,26.16 3 1
+github.com/rifqoi/mygram-api-mux/services/user.go:30.2,36.17 2 1
+github.com/rifqoi/mygram-api-mux/services/user.go:20.16,22.3 1 0
+github.com/rifqoi/mygram-api-mux/services/user.go:26.16,28.3 1 1

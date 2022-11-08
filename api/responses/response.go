@@ -11,28 +11,37 @@ type Response struct {
 	Error   any    `json:"error,omitempty"`
 }
 
-func ErrorBadRequestResponse(w http.ResponseWriter, msg string, err any) {
+func ErrorBadRequestResponse(w http.ResponseWriter, err any) {
 	resp := Response{
-		Message: msg,
+		Message: "BAD_REQUEST_ERROR",
 		Error:   err,
 	}
 	baseResponse(w, resp, http.StatusBadRequest)
 }
 
-func ErrorInternalServerResponse(w http.ResponseWriter, msg string, err any) {
+func ErrorInternalServerResponse(w http.ResponseWriter, err any) {
 	resp := Response{
-		Message: msg,
+		Message: "INTERNAL_SERVER_ERROR",
 		Error:   err,
 	}
 	baseResponse(w, resp, http.StatusInternalServerError)
 }
 
-func ErrorUnprocessableEntity(w http.ResponseWriter, msg string, err any) {
+func ErrorUnprocessableEntity(w http.ResponseWriter, err any) {
 	resp := Response{
-		Message: msg,
+		Message: "UNPROCESSABLE_ENTITY",
 		Error:   err,
 	}
 	baseResponse(w, resp, http.StatusUnprocessableEntity)
+}
+
+func UnauthorizedRequest(w http.ResponseWriter, err any) {
+	resp := Response{
+		Message: "UNAUTHORIZED_REQUEST",
+		Error:   err,
+	}
+
+	baseResponse(w, resp, http.StatusUnauthorized)
 }
 
 func SuccessResponse(w http.ResponseWriter, data any) {
